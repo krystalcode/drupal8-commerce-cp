@@ -222,7 +222,8 @@ class ShippingInformation extends AreaPluginBase {
     $shipping_pane = $form_state->get('shipping_information_pane');
     $shipping_pane->validatePaneForm(
       $form['shipping_information'],
-      $form_state, $form
+      $form_state,
+      $form
     );
   }
 
