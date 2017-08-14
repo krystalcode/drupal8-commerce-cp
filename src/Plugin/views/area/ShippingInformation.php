@@ -87,6 +87,35 @@ class ShippingInformation extends AreaPluginBase {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function buildOptionsForm(&$form, FormStateInterface $form_state) {
+    parent::buildOptionsForm($form, $form_state);
+
+    // Whether to show the shipping profile form field.
+    $show_shipping_profile = TRUE;
+    if (isset($this->options['show_shipping_profile']) && !$this->options['show_shipping_profile']) {
+      $show_shipping_profile = FALSE;
+    }
+    $form['show_shipping_profile'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Display the Shipping Profile form field'),
+      '#default_value' => $show_shipping_profile,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function defineOptions() {
+    $options = parent::defineOptions();
+
+    $options['show_shipping_profile'] = ['default' => TRUE];
+
+    return $options;
+  }
+
+  /**
    * Form constructor for the views form.
    *
    * @param array $form
@@ -176,11 +205,12 @@ class ShippingInformation extends AreaPluginBase {
       $form
     );
 
-    // @todo Add a plugin option for defining whether to show the address field
-    if (!$plugin_configuration['panes']['shipping_information']['require_shipping_profile']) {
-      unset($form['shipping_information']['shipping_profile']);
-      unset($form['shipping_information']['recalculate_shipping']);
+    if (!$this->options['show_shipping_profile']) {
+      $form['shipping_information']['shipping_profile']['#access'] = FALSE;
     }
+
+    // Re-calculating shipping costs is not supported yet.
+    unset($form['shipping_information']['recalculate_shipping']);
   }
 
   /**
@@ -203,41 +233,17 @@ class ShippingInformation extends AreaPluginBase {
    */
   public function viewsFormSubmit($form, FormStateInterface $form_state) {
     $shipping_pane = $form_state->get('shipping_information_pane');
+    $shipping_pane->submitPaneForm(
+      $form['shipping_information'],
+      $form_state,
+      $form
+    );
+
+    // The shipping information pane form submission callback will potentially
+    // alter the order's shipments the determine the order's shipping costs, so
+    // we need to save the order.
     $order = $form_state->get('order');
-    $pane_form = &$form['shipping_information'];
-
-    // Save the modified shipments. The main difference from the original
-    // Shipping Information pane submit callback is that that one requires a
-    // shipping profile, while here we don't. We allow store admins to postpone
-    // entering shipping details until the checkout process.
-    $shipments = [];
-    foreach (Element::children($pane_form['shipments']) as $index) {
-      /** @var \Drupal\commerce_shipping\Entity\ShipmentInterface $shipment */
-      $shipment = clone $pane_form['shipments'][$index]['#shipment'];
-      $form_display = EntityFormDisplay::collectRenderDisplay(
-        $shipment,
-        'default'
-      );
-      $form_display->removeComponent('shipping_profile');
-      $form_display->removeComponent('title');
-      $form_display->extractFormValues(
-        $shipment,
-        $pane_form['shipments'][$index],
-        $form_state
-      );
-      $shipment->save();
-      $shipments[] = $shipment;
-    }
-    $order->shipments = $shipments;
     $order->save();
-
-    // Delete shipments that are no longer in use.
-    $removed_shipment_ids = $pane_form['removed_shipments']['#value'];
-    if (!empty($removed_shipment_ids)) {
-      $shipment_storage = $this->entity_type_manager->getStorage('commerce_shipment');
-      $removed_shipments = $shipment_storage->loadMultiple($removed_shipment_ids);
-      $shipment_storage->delete($removed_shipments);
-    }
   }
 
   /**
