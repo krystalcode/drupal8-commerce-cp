@@ -1,0 +1,8 @@
+name: Commerce Checkout Pane
+type: module
+description: 'Provides the ability to add checkout panes to the cart form.'
+package: Commerce (contrib)
+core: 8.x
+dependencies:
+  - commerce:commerce_cart
+  - system (>=8.3.0)
