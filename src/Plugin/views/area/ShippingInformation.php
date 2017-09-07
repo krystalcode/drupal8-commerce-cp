@@ -42,7 +42,7 @@ class ShippingInformation extends AreaPluginBase {
   protected $checkout_pane_manager;
 
   /**
-   * Constructs a new OrderTotal instance.
+   * Constructs a new ShippingInformation instance.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
@@ -170,8 +170,7 @@ class ShippingInformation extends AreaPluginBase {
     }
 
     // The plugin should contain the shipping_information pane provided by
-    // commerce_shipping that also contains the require_shipping_profile option
-    // because we modify our form depending on that.
+    // commerce_shipping that also contains the require_shipping_profile option.
     $plugin_configuration = $plugin['configuration']->getConfiguration();
     if (!isset($plugin_configuration['panes']['shipping_information']['require_shipping_profile'])) {
       return;
