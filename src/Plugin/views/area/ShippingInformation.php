@@ -217,7 +217,11 @@ class ShippingInformation extends AreaPluginBase {
    *
    * @see \Drupal\views\Form\ViewsFormMainForm::validateForm
    */
-  public function viewsFormValidate($form, FormStateInterface $form_state) {
+  public function viewsFormValidate(&$form, FormStateInterface $form_state) {
+    if (!isset($form['shipping_information'])) {
+      return;
+    }
+
     $shipping_pane = $form_state->get('shipping_information_pane');
     $shipping_pane->validatePaneForm(
       $form['shipping_information'],
@@ -231,7 +235,11 @@ class ShippingInformation extends AreaPluginBase {
    *
    * @see \Drupal\views\Form\ViewsFormMainForm::submitForm
    */
-  public function viewsFormSubmit($form, FormStateInterface $form_state) {
+  public function viewsFormSubmit(&$form, FormStateInterface $form_state) {
+    if (!isset($form['shipping_information'])) {
+      return;
+    }
+
     $shipping_pane = $form_state->get('shipping_information_pane');
     $shipping_pane->submitPaneForm(
       $form['shipping_information'],
