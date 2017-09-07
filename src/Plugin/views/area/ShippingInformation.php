@@ -209,7 +209,7 @@ class ShippingInformation extends AreaPluginBase {
     }
 
     // Re-calculating shipping costs is not supported yet.
-    unset($form['shipping_information']['recalculate_shipping']);
+    $form['shipping_information']['recalculate_shipping']['#access'] = FALSE;
   }
 
   /**
