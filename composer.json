@@ -1,0 +1,11 @@
+{
+    "name": "drupal/commerce_cp",
+    "type": "drupal-module",
+    "description": "A Drupal 8 sandbox module that provides panes for the shopping cart page.",
+    "homepage": "git.drupal.org:sandbox/krystalcode/2902109.git",
+    "license": "GPL-2.0+",
+    "require": {
+        "drupal/commerce": "~2.0"
+    },
+    "minimum-stability": "dev"
+}
